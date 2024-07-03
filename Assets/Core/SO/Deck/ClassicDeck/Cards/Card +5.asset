@@ -16,5 +16,5 @@ MonoBehaviour:
   hasTwoValues: 0
   firstCardValue: 1
   secondCardValue: 11
-  frontSprite: {fileID: 0}
-  backSprite: {fileID: 0}
+  frontSprite: {fileID: 213358731, guid: 94f17532860929b47b80b777c68fd0cf, type: 3}
+  backSprite: {fileID: 1734979734, guid: 94f17532860929b47b80b777c68fd0cf, type: 3}

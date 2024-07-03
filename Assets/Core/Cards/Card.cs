@@ -9,7 +9,7 @@ namespace Assets.Core.Cards
         [Header("Card Visuals")]
         [Space]
         [Tooltip("Main sprite that will be changed from CardData")]
-        [SerializeField] private Sprite cardSprite;
+        [SerializeField] private SpriteRenderer cardSpriteRenderer;
         [Space]
         [Tooltip("Array of TMP taht will display cards value from CardData")]
         [SerializeField] private TextMeshPro[] cardTextArray;
@@ -73,7 +73,7 @@ namespace Assets.Core.Cards
         }
         private void ChangeCardSprite(Sprite sprite)
         {
-            cardSprite = sprite;
+            cardSpriteRenderer.sprite = sprite;
         }
     }
 }
