@@ -1,101 +1,124 @@
 using UnityEngine;
 using System.Collections;
+using Assets.Core.Cards;
+using Assets.Core.Managers;
+using System.Collections.Generic;
 
-public class Hand : MonoBehaviour
+namespace Assets.Core.Hands
 {
-    [SerializeField] private GameObject cardPrefab;
-    [SerializeField] private Transform handTransform;
-    [SerializeField] private Transform deckTransform;
-    [SerializeField] private float maxSpacing = 1f;
-    [SerializeField] private float minSpacing = 0.25f;
-    [SerializeField] private int maxNoOverlapCards = 2;
-    [SerializeField] private int maxCardsInHand = 11;
-    [SerializeField] private int initialRenderingOrder = 500;
-
-    [SerializeField] private AnimationCurve transitionSpeedCurve;
-
-    private float GetAnimationCurveDuration(AnimationCurve animationCurve)
+    public class Hand : MonoBehaviour
     {
-        Keyframe maxTimeKeyframe = animationCurve.keys[0];
-        foreach (Keyframe key in animationCurve.keys)
-        {
-            if (key.time > maxTimeKeyframe.time) maxTimeKeyframe = key;
-        }
-        return maxTimeKeyframe.time;
-    }
-    private void UpdateCardPositions()
-    {
-        StartCoroutine(UpdateCardPositionsCoroutine());
-    }
+        private GameObject cardPrefab;
+        private Transform deckTransform;
+        private float maxSpacing = 1f;
+        private float minSpacing = 0.25f;
+        private int maxNoOverlapCards = 2;
+        private int maxCardsInHand = 11;
+        private int initialRenderingOrder = 500;
+        private AnimationCurve transitionSpeedCurve;
 
-    private IEnumerator UpdateCardPositionsCoroutine()
-    {
-        int cardCount = handTransform.childCount;
+        private List<Card> cardList;
 
-        float cardSpacing;
-        if (cardCount <= maxNoOverlapCards)
+        public void SetupHand(HandConfigData handConfigData)
         {
-            cardSpacing = maxSpacing;
-        }
-        else
-        {
-            cardSpacing = Mathf.Lerp(maxSpacing, minSpacing, (float)(cardCount - maxNoOverlapCards) / (maxCardsInHand - maxNoOverlapCards));
-        }
+            CleanHand();
 
-        float handWidth = cardSpacing * (cardCount - 1);
-        float startX = -handWidth / 2;
-
-        Vector3[] targetPositions = new Vector3[cardCount];
-        for (int i = 0; i < cardCount; i++)
-        {
-            float xPos = startX + i * cardSpacing;
-            targetPositions[i] = new Vector3(xPos, 0, 0);
+            cardPrefab = handConfigData.cardPrefab;
+            deckTransform = handConfigData.deckTransform;
+            maxSpacing = handConfigData.maxSpacing;
+            minSpacing = handConfigData.minSpacing;
+            maxNoOverlapCards = handConfigData.maxNoOverlapCards;
+            maxCardsInHand = handConfigData.maxCardsInHand;
+            initialRenderingOrder = handConfigData.initialRenderingOrder;
+            transitionSpeedCurve = handConfigData.transitionSpeedCurve;
         }
 
-        float elapsedTime = 0f;
-        Vector3[] startPositions = new Vector3[cardCount];
-        for (int i = 0; i < cardCount; i++)
+        private float GetAnimationCurveDuration(AnimationCurve animationCurve)
         {
-            startPositions[i] = handTransform.GetChild(i).localPosition;
+            Keyframe maxTimeKeyframe = animationCurve.keys[0];
+            foreach (Keyframe key in animationCurve.keys)
+            {
+                if (key.time > maxTimeKeyframe.time) maxTimeKeyframe = key;
+            }
+            return maxTimeKeyframe.time;
+        }
+        private void UpdateCardPositions()
+        {
+            StartCoroutine(UpdateCardPositionsCoroutine());
         }
 
-        float transitionDuration = GetAnimationCurveDuration(transitionSpeedCurve);
-
-        while (elapsedTime < transitionDuration)
+        private IEnumerator UpdateCardPositionsCoroutine()
         {
+            int cardCount = transform.childCount;
+
             for (int i = 0; i < cardCount; i++)
             {
-                Transform card = handTransform.GetChild(i);
-                card.localPosition = Vector3.Lerp(startPositions[i], targetPositions[i], transitionSpeedCurve.Evaluate(elapsedTime));
+                Transform cardTransform = transform.GetChild(i);
+                Card card = cardTransform.GetComponent<Card>();
+                card.ChangeCardRenderingOrder(i + initialRenderingOrder);
             }
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
 
-        for (int i = initialRenderingOrder; i < cardCount; i++)
-        {
-            Transform card = handTransform.GetChild(i);
-            card.localPosition = targetPositions[i];
-
-            // Встановлюємо порядок рендерингу
-            SpriteRenderer spriteRenderer = card.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null)
+            float cardSpacing;
+            if (cardCount <= maxNoOverlapCards)
             {
-                spriteRenderer.sortingOrder = i;
+                cardSpacing = maxSpacing;
+            }
+            else
+            {
+                cardSpacing = Mathf.Lerp(maxSpacing, minSpacing, (float)(cardCount - maxNoOverlapCards) / (maxCardsInHand - maxNoOverlapCards));
+            }
+
+            float handWidth = cardSpacing * (cardCount - 1);
+            float startX = -handWidth / 2;
+
+            Vector3[] targetPositions = new Vector3[cardCount];
+            for (int i = 0; i < cardCount; i++)
+            {
+                float xPos = startX + i * cardSpacing;
+                targetPositions[i] = new Vector3(xPos, 0, 0);
+            }
+
+            float elapsedTime = 0f;
+            Vector3[] startPositions = new Vector3[cardCount];
+            for (int i = 0; i < cardCount; i++)
+            {
+                startPositions[i] = transform.GetChild(i).localPosition;
+            }
+
+            float transitionDuration = GetAnimationCurveDuration(transitionSpeedCurve);
+
+            while (elapsedTime < transitionDuration)
+            {
+                for (int i = 0; i < cardCount; i++)
+                {
+                    Transform cardTransform = transform.GetChild(i);
+                    cardTransform.localPosition = Vector3.Lerp(startPositions[i], targetPositions[i], transitionSpeedCurve.Evaluate(elapsedTime));
+                }
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+
+        }
+
+        [ContextMenu("Add card")]
+        public void AddCard(CardData cardData, bool openCard)
+        {
+            GameObject newCard = Instantiate(cardPrefab, deckTransform.position, Quaternion.identity, transform);
+
+            Card card = newCard.transform.GetComponent<Card>();
+            card.SetupCard(cardData, openCard);
+            //cardList.Add(card);
+
+            UpdateCardPositions();
+        }
+
+        public void CleanHand()
+        {
+            foreach(Transform cardTransform in transform)
+            {
+                Destroy(cardTransform.gameObject);
             }
         }
-    }
-
-    [ContextMenu("Add card")]
-    public void AddCard()
-    {
-        Instantiate(cardPrefab, deckTransform.position, Quaternion.identity, handTransform);
-        UpdateCardPositions();
-    }
-
-    public void RemoveCard(GameObject card)
-    {
-        Destroy(card);
-        UpdateCardPositions();
     }
 }

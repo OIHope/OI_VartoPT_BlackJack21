@@ -1,12 +1,14 @@
 using Assets.Core.Cards;
+using Assets.Core.Deck;
+using Assets.Core.Global;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Core.Deck
+namespace Assets.Core.Managers
 {
-    public class Deck : MonoBehaviour
+    public class DeckManager : MonoBehaviour
     {
         [Header("Debug Only!")]
         [SerializeField] private CardDeck cardDeck;
@@ -17,6 +19,7 @@ namespace Assets.Core.Deck
             cardDeck = deckToPlay;
             cardDataList = cardDeck.GetShuffledCardDeck();
             yield return null;
+
         }
 
         public CardData TakeCardFromDeck()

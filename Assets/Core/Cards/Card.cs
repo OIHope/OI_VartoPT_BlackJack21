@@ -10,15 +10,17 @@ namespace Assets.Core.Cards
         [Space]
         [Tooltip("Main sprite that will be changed from CardData")]
         [SerializeField] private SpriteRenderer cardSpriteRenderer;
-        [Space]
-        [Tooltip("Array of TMP taht will display cards value from CardData")]
-        [SerializeField] private TextMeshPro[] cardTextArray;
 
         [Space(25)]
         [Header("Debug Only")]
         [Space]
         [SerializeField] private CardData cardData;
-        [SerializeField] private bool cardIsOpen = false;
+
+
+        public void ChangeCardRenderingOrder(int order)
+        {
+            cardSpriteRenderer.sortingOrder = order;
+        }
 
         public void SetupCard(CardData cardData, bool openThisCard)
         {
@@ -43,37 +45,16 @@ namespace Assets.Core.Cards
 
             if (cardMustBeOpened)
             {
-                cardIsOpen = true;
                 ChangeCardSprite(cardData.CardFrontSprite);
-                DisplayCardText(true);
-
                 return;
             }
-
-            cardIsOpen = false;
             ChangeCardSprite(cardData.CardBackSprite);
-            DisplayCardText(false);
         }
 
-        private void DisplayCardText(bool display)
-        {
-            if (!display)
-            {
-                foreach(TextMeshPro cardText in cardTextArray)
-                {
-                    cardText.gameObject.SetActive(false);
-                }
-                return;
-            }
-            foreach (TextMeshPro cardText in cardTextArray)
-            {
-                cardText.gameObject.SetActive(true);
-                cardText.text = cardData.GetCardDisplayInfo();
-            }
-        }
         private void ChangeCardSprite(Sprite sprite)
         {
             cardSpriteRenderer.sprite = sprite;
         }
+        
     }
 }
