@@ -19,10 +19,10 @@ namespace Assets.Core.Managers
         {
             this.playerHand = playerHand;
             this.botHand = botHand;
-            this.deck = handConfigData.deckManager;
+            deck = handConfigData.deckManager;
 
-            playerHand.SetupHand(handConfigData);
-            botHand.SetupHand(handConfigData);
+            playerHand.SetupHand(handConfigData, true);
+            botHand.SetupHand(handConfigData, false);
 
             int takeCardsCount = handConfigData.startWithCardsCount;
             for (int i = 0; i < takeCardsCount; i++)

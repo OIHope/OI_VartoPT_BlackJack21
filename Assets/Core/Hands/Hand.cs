@@ -3,6 +3,7 @@ using System.Collections;
 using Assets.Core.Cards;
 using Assets.Core.Managers;
 using System.Collections.Generic;
+using Assets.Core.Global;
 
 namespace Assets.Core.Hands
 {
@@ -17,9 +18,13 @@ namespace Assets.Core.Hands
         private int initialRenderingOrder = 500;
         private AnimationCurve transitionSpeedCurve;
 
-        private List<Card> cardList;
+        private List<Card> cardList = new();
+        public List<Card> CardsOnHand => cardList;
 
-        public void SetupHand(HandConfigData handConfigData)
+        private bool playersHand = false;
+        public bool IsPlayersHand => playersHand;
+
+        public void SetupHand(HandConfigData handConfigData, bool isPlayersHand)
         {
             CleanHand();
 
@@ -31,6 +36,8 @@ namespace Assets.Core.Hands
             maxCardsInHand = handConfigData.maxCardsInHand;
             initialRenderingOrder = handConfigData.initialRenderingOrder;
             transitionSpeedCurve = handConfigData.transitionSpeedCurve;
+
+            playersHand = isPlayersHand;
         }
 
         private float GetAnimationCurveDuration(AnimationCurve animationCurve)
@@ -108,8 +115,9 @@ namespace Assets.Core.Hands
 
             Card card = newCard.transform.GetComponent<Card>();
             card.SetupCard(cardData, openCard);
-            //cardList.Add(card);
+            cardList.Add(card);
 
+            GlobalEvents.InvokeEvent<Hand>(GlobalEvents.ON_CARD_IS_TAKEN, this);
             UpdateCardPositions();
         }
 
