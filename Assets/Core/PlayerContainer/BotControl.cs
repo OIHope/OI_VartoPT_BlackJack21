@@ -10,19 +10,23 @@ namespace Assets.Core.PlayerContainer
     {
         public override IEnumerator StartTurn(Hand playersHand, PlayerControlls playerControlls, int maxScore)
         {
+            GlobalEvents.InvokeEvent(GlobalEvents.ON_BOT_WAITS);
             yield return base.StartTurn(playersHand, playerControlls, maxScore);
             thinkTime = playerControlls.botThinkTime;
 
             while (!readyToPassTurn)
             {
+                GlobalEvents.InvokeEvent(GlobalEvents.ON_BOT_THINKS);
                 yield return new WaitForSeconds(thinkTime);
 
                 if (WillTakeCard(score, maxScore))
                 {
+                    GlobalEvents.InvokeEvent(GlobalEvents.ON_BOT_TAKES_CARD);
                     TakeCard();
                 }
                 else
                 {
+                    GlobalEvents.InvokeEvent(GlobalEvents.ON_BOT_PASS_TURN);
                     FinishTurn();
                 }
             }

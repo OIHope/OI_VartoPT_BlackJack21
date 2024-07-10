@@ -35,6 +35,11 @@ namespace Assets.Core.Managers
 
             yield return null;
         }
+        public IEnumerator UninstalHandsManager()
+        {
+            GlobalEvents.Unsubscribe<Hand, bool>(GlobalEvents.ON_PLAYER_TAKES_CARD, TakeCard);
+            yield return null;
+        }
         private void TakeCard(Hand hand, bool openCard)
         {
             StartCoroutine(HandTakesCard(hand, openCard));
@@ -44,6 +49,12 @@ namespace Assets.Core.Managers
             CardData cardData = deck.TakeCardFromDeck();
             hand.AddCard(cardData, openCard);
             yield return new WaitForSeconds(takeCardsDelay);
+        }
+        public IEnumerator RevealHands()
+        {
+            yield return playerHand.OpenHand();
+            yield return botHand.OpenHand();
+            GlobalEvents.InvokeEvent(GlobalEvents.ON_CARDS_REVEALED);
         }
     }
 }

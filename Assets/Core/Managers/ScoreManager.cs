@@ -40,11 +40,17 @@ namespace Assets.Core.Managers
         }
         public IEnumerator SetupScoreManager(ScoreConfigData scoreConfigData)
         {
-            this.uiPlayerScoreText = scoreConfigData.uiPlayerScoreText;
-            this.uiBotScoreText = scoreConfigData.uiBotScoreText;
-            this.maxScoreToWin = scoreConfigData.maxScoreToWin;
+            uiPlayerScoreText = scoreConfigData.uiPlayerScoreText;
+            uiBotScoreText = scoreConfigData.uiBotScoreText;
+            maxScoreToWin = scoreConfigData.maxScoreToWin;
 
             GlobalEvents.Subscribe<Hand>(GlobalEvents.ON_CARD_IS_TAKEN, CalculateScore);
+
+            yield return null;
+        }
+        public IEnumerator UninstalScoreManager()
+        {
+            GlobalEvents.Unsubscribe<Hand>(GlobalEvents.ON_CARD_IS_TAKEN, CalculateScore);
 
             yield return null;
         }
@@ -61,18 +67,44 @@ namespace Assets.Core.Managers
                 handScore = CulculateCardsValues(cardsOnHandList, true);
             }
 
-            bool winningScore = handScore == maxScoreToWin;
-
             if (currentHand.IsPlayersHand)
             {
-                DisplayScore(uiPlayerScoreText, ("Player"), handScore, overflow, winningScore);
+                _playerScore = handScore;
+                DisplayScore(uiPlayerScoreText, ("Player"), handScore);
             }
             else
             {
-                DisplayScore(uiBotScoreText, ("Bot"), handScore, overflow, winningScore);
+                _botScore = handScore;
+                DisplayScore(uiBotScoreText, ("Bot"), handScore);
             }
 
             GlobalEvents.InvokeEvent(GlobalEvents.ON_SCORE_UPDATED, currentHand, handScore);
+        }
+
+        public IEnumerator SumUpScoreAndDeclareWinner()
+        {
+            bool playerWinsCondition = (_playerScore > _botScore && _playerScore <= maxScoreToWin) || _playerScore <= maxScoreToWin;
+            bool botWinsCondition = (_botScore > _playerScore && _botScore <= maxScoreToWin) || _botScore <= maxScoreToWin;
+            bool drawCondition = _playerScore == _botScore || (!botWinsCondition && !playerWinsCondition);
+
+            Debug.Log($"player win = {playerWinsCondition}, bot win = {botWinsCondition}, draw = {drawCondition}");
+            yield return new WaitForSeconds(3f);
+
+            if (playerWinsCondition)
+            {
+                GlobalEvents.InvokeEvent(GlobalEvents.ON_PLAYER_WIN);
+                Debug.Log("Player wins!");
+            }
+            else if (botWinsCondition)
+            {
+                GlobalEvents.InvokeEvent(GlobalEvents.ON_PLAYER_LOSE);
+                Debug.Log("Bot wins!");
+            }
+            else if (drawCondition)
+            {
+                GlobalEvents.InvokeEvent(GlobalEvents.ON_DRAW);
+                Debug.Log("Draw!");
+            }
         }
 
         private int CulculateCardsValues(List<Card> cardsOnHandList, bool overflow)
@@ -89,23 +121,13 @@ namespace Assets.Core.Managers
             return handScore;
         }
 
-        private void DisplayScore(TextMeshProUGUI uiText, string playerName, int scoreValue, bool overflow, bool winningScore)
+        private void DisplayScore(TextMeshProUGUI uiText, string playerName, int scoreValue)
         {
             string name = playerName;
             string inBetween = ("'s score: ");
             string score = scoreValue.ToString();
 
             string fullDescription = name + inBetween + score;
-
-            if (overflow)
-            {
-                fullDescription = name + (" fucked up!");
-            }
-            if (winningScore)
-            {
-                fullDescription = name.ToUpper() + (" SCORED!");
-            }
-
             uiText.text = fullDescription;
         }
     }

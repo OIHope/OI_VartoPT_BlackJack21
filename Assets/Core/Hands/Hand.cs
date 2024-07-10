@@ -104,8 +104,6 @@ namespace Assets.Core.Hands
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
-
-
         }
 
         public void AddCard(CardData cardData, bool openCard)
@@ -118,6 +116,47 @@ namespace Assets.Core.Hands
 
             GlobalEvents.InvokeEvent<Hand>(GlobalEvents.ON_CARD_IS_TAKEN, this);
             UpdateCardPositions();
+        }
+
+        public IEnumerator OpenHand()
+        {
+            foreach (Card card in cardList)
+            {
+                card.ToggleCardOpen(true);
+            }
+
+            yield return MoveCards();
+        }
+        private IEnumerator MoveCards()
+        {
+            int cardCount = cardList.Count;
+            float yDisplaysment = playersHand ? 0.3f : -0.3f;
+
+            Vector3[] startPositions = new Vector3[cardCount];
+            for (int i = 0; i < cardCount; i++)
+            {
+                startPositions[i] = transform.GetChild(i).localPosition;
+            }
+
+            Vector3[] targetPositions = new Vector3[cardCount];
+            for (int i = 0; i < cardCount; i++)
+            {
+                targetPositions[i] = startPositions[i];
+                targetPositions[i].y += yDisplaysment;
+            }
+            float elapsedTime = 0f;
+            float transitionDuration = GetAnimationCurveDuration(transitionSpeedCurve);
+
+            while (elapsedTime < transitionDuration)
+            {
+                for (int i = 0; i < cardCount; i++)
+                {
+                    Transform cardTransform = transform.GetChild(i);
+                    cardTransform.localPosition = Vector3.Lerp(startPositions[i], targetPositions[i], transitionSpeedCurve.Evaluate(elapsedTime));
+                }
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
         }
 
         public void CleanHand()

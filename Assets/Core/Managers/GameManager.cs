@@ -1,9 +1,11 @@
 using Assets.Core.Deck;
+using Assets.Core.Global;
 using Assets.Core.Hands;
 using Assets.Core.PlayerContainer;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Assets.Core.Managers
@@ -39,6 +41,15 @@ namespace Assets.Core.Managers
         [SerializeField] private TurnManager turnManager;
         [Space]
         [SerializeField] private TurnConfigData turnConfigData;
+        [Space(25)]
+        [Header("UI Related")]
+        [Space]
+        [SerializeField] private UIManager uiManager;
+        [Space]
+        [SerializeField] private UIConfigData uiConfigData;
+        [Space(10)]
+        [SerializeField] private UIControlsManager uiControlsManager;
+        [SerializeField] private UIControlsData uiControlsData;
 
 
 
@@ -51,15 +62,44 @@ namespace Assets.Core.Managers
         {
             loadingScreenManager.FastLoadingScreen();
 
+            yield return uiManager.SetupUIManager(uiConfigData);
+            yield return uiControlsManager.SetupUIContolsManager(uiControlsData);
+
             yield return scoreManager.SetupScoreManager(scoreConfigData);
             yield return turnManager.SetupTurnManager(turnConfigData);
 
             yield return deckManager.SetupDeck(cardDeckToPlay);
 
             yield return loadingScreenManager.ToggleLoadingScreen(false);
+            GlobalEvents.Subscribe(GlobalEvents.ON_RESTART_TRIGGERED, StartRestartingGame);
 
             yield return handsManager.SetupHandManager(playerHand, botHand, handConfigData);
             yield return turnManager.StartPlaying();
+
+            yield return handsManager.RevealHands();
+            yield return scoreManager.SumUpScoreAndDeclareWinner();
+        }
+        private void StartRestartingGame()
+        {
+            StopAllCoroutines();
+            StartCoroutine(RestartGame());
+        }
+        private IEnumerator RestartGame()
+        {
+            GlobalEvents.Unsubscribe(GlobalEvents.ON_RESTART_TRIGGERED, StartRestartingGame);
+            yield return loadingScreenManager.ToggleResettingScreen(true);
+
+            yield return uiManager.UninstalUIManager();
+            yield return uiControlsManager.UninstalUIControlsManager();
+            yield return scoreManager.UninstalScoreManager();
+            yield return handsManager.UninstalHandsManager();
+
+            ReloadScene();
+        }
+        public void ReloadScene()
+        {
+            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            SceneManager.LoadScene(currentSceneIndex);
         }
         private void DisablePlayerControlls()
         {
@@ -110,5 +150,27 @@ namespace Assets.Core.Managers
 
         public Button takeCardButton;
         public Button finishTurnButton;
+    }
+
+    [System.Serializable]
+    public class UIConfigData
+    {
+        public CanvasGroup playerStatsScreen;
+        public CanvasGroup botStatsScreen;
+
+        public CanvasGroup botActionsScreen;
+
+        public CanvasGroup playerWinScreen;
+        public CanvasGroup playerLoseScreen;
+        public CanvasGroup drawScreen;
+
+        public CanvasGroup controlsGameplayScreen;
+        public CanvasGroup controlSystemScreen;
+    }
+
+    [System.Serializable]
+    public class UIControlsData
+    {
+        public Button restartButton;
     }
 }

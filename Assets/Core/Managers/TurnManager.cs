@@ -1,3 +1,4 @@
+using Assets.Core.Global;
 using Assets.Core.Hands;
 using Assets.Core.PlayerContainer;
 using System.Collections;
@@ -35,21 +36,15 @@ namespace Assets.Core.Managers
 
         public IEnumerator StartPlaying()
         {
-            yield return TurnTakeCardsPhase();
-            yield return TurnScoresCheckPhase();
-        }
-        private IEnumerator TurnTakeCardsPhase()
-        {
+            GlobalEvents.InvokeEvent(GlobalEvents.ON_PLAYER_TAKES_TURN);
             yield return Turn(player, playerHand);
             yield return new WaitForSeconds(playerControlls.playerThinkTime);
 
+            GlobalEvents.InvokeEvent(GlobalEvents.ON_BOT_TAKES_TURN);
             yield return Turn(bot, botHand);
             yield return new WaitForSeconds(playerControlls.botThinkTime);
         }
-        private IEnumerator TurnScoresCheckPhase()
-        {
-            yield return null;
-        }
+
         private IEnumerator Turn(Player currentPlayer, Hand currentHand)
         {
             int maxScore = ScoreManager.Instance.MaxScore;
