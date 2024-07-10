@@ -52,7 +52,8 @@ namespace Assets.Core.Managers
         }
         private IEnumerator Turn(Player currentPlayer, Hand currentHand)
         {
-            yield return currentPlayer.StartTurn(currentHand, playerControlls);
+            int maxScore = ScoreManager.Instance.MaxScore;
+            yield return currentPlayer.StartTurn(currentHand, playerControlls, maxScore);
         }
 
     }

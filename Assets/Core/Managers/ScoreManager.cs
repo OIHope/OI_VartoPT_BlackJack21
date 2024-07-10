@@ -10,6 +10,10 @@ namespace Assets.Core.Managers
 {
     public class ScoreManager : MonoBehaviour
     {
+        private static ScoreManager _instance;
+        public static ScoreManager Instance { get { return _instance; } }
+
+
         private TextMeshProUGUI uiPlayerScoreText;
         private TextMeshProUGUI uiBotScoreText;
 
@@ -20,7 +24,20 @@ namespace Assets.Core.Managers
 
         public int PlayerScore => _playerScore;
         public int BotScore => _botScore;
+        public int MaxScore => maxScoreToWin;
 
+
+        private void Awake()
+        {
+            if (_instance == null)
+            {
+                _instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
         public IEnumerator SetupScoreManager(ScoreConfigData scoreConfigData)
         {
             this.uiPlayerScoreText = scoreConfigData.uiPlayerScoreText;
@@ -37,18 +54,22 @@ namespace Assets.Core.Managers
             List<Card> cardsOnHandList = currentHand.CardsOnHand;
 
             int handScore = CulculateCardsValues(cardsOnHandList, false);
-            if (handScore > maxScoreToWin)
+
+            bool overflow = handScore > maxScoreToWin;
+            if (overflow)
             {
                 handScore = CulculateCardsValues(cardsOnHandList, true);
             }
 
+            bool winningScore = handScore == maxScoreToWin;
+
             if (currentHand.IsPlayersHand)
             {
-                DisplayScore(uiPlayerScoreText, handScore);
+                DisplayScore(uiPlayerScoreText, ("Player"), handScore, overflow, winningScore);
             }
             else
             {
-                DisplayScore(uiBotScoreText, handScore);
+                DisplayScore(uiBotScoreText, ("Bot"), handScore, overflow, winningScore);
             }
 
             GlobalEvents.InvokeEvent(GlobalEvents.ON_SCORE_UPDATED, currentHand, handScore);
@@ -68,12 +89,24 @@ namespace Assets.Core.Managers
             return handScore;
         }
 
-        private void DisplayScore(TextMeshProUGUI uiText, int scoreValue)
+        private void DisplayScore(TextMeshProUGUI uiText, string playerName, int scoreValue, bool overflow, bool winningScore)
         {
-            string introduction = ("Score: ");
+            string name = playerName;
+            string inBetween = ("'s score: ");
             string score = scoreValue.ToString();
 
-            uiText.text = introduction + score;
+            string fullDescription = name + inBetween + score;
+
+            if (overflow)
+            {
+                fullDescription = name + (" fucked up!");
+            }
+            if (winningScore)
+            {
+                fullDescription = name.ToUpper() + (" SCORED!");
+            }
+
+            uiText.text = fullDescription;
         }
     }
 }

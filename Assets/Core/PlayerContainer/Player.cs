@@ -9,14 +9,29 @@ namespace Assets.Core.PlayerContainer
     public abstract class Player : MonoBehaviour
     {
         protected Hand playersHand;
-        protected int score;
         protected float thinkTime = 1f;
+
+        protected int score;
+        protected bool subscribedToScoreUpdate = false;
+
         protected bool readyToPassTurn = false;
 
-        public virtual IEnumerator StartTurn(Hand playersHand, PlayerControlls playerControlls)
+        protected void Awake()
         {
-            SubscribeToScoreUpdate(true);
+            if (!subscribedToScoreUpdate)
+            {
+                SubscribeToScoreUpdate(true);
+            }
+        }
+
+        public virtual IEnumerator StartTurn(Hand playersHand, PlayerControlls playerControlls, int maxScore)
+        {
+            if (!subscribedToScoreUpdate)
+            {
+                SubscribeToScoreUpdate(true);
+            }
             this.playersHand = playersHand;
+            readyToPassTurn = false;
             yield return null;
         }
         protected abstract void TakeCard();
@@ -24,7 +39,10 @@ namespace Assets.Core.PlayerContainer
 
         protected void FinishTurn()
         {
-            SubscribeToScoreUpdate(false);
+            if (subscribedToScoreUpdate)
+            {
+                SubscribeToScoreUpdate(false);
+            }
             readyToPassTurn = true;
         }
         protected void SubscribeToScoreUpdate(bool subscribe)
@@ -32,10 +50,12 @@ namespace Assets.Core.PlayerContainer
             if (subscribe)
             {
                 GlobalEvents.Subscribe<Hand, int>(GlobalEvents.ON_SCORE_UPDATED, UpdateScore);
+                subscribedToScoreUpdate = subscribe;
             }
             else
             {
                 GlobalEvents.Unsubscribe<Hand, int>(GlobalEvents.ON_SCORE_UPDATED, UpdateScore);
+                subscribedToScoreUpdate = subscribe;
             }
         }
     }

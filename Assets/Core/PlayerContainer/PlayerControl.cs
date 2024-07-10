@@ -8,10 +8,14 @@ namespace Assets.Core.PlayerContainer
 {
     public class PlayerControl : Player
     {
-        public override IEnumerator StartTurn(Hand playersHand, PlayerControlls playerControlls)
+        public override IEnumerator StartTurn(Hand playersHand, PlayerControlls playerControlls, int maxScore)
         {
+            yield return base.StartTurn(playersHand, playerControlls, maxScore);
+
             playerControlls.takeCardButton.onClick.AddListener(TakeCard);
             playerControlls.finishTurnButton.onClick.AddListener(FinishTurn);
+
+            TogglePlayerControls(playerControlls, true);
 
             this.playersHand = playersHand;
             thinkTime = playerControlls.playerThinkTime;
@@ -20,6 +24,14 @@ namespace Assets.Core.PlayerContainer
 
             playerControlls.takeCardButton.onClick.RemoveListener(TakeCard);
             playerControlls.finishTurnButton.onClick.RemoveListener(FinishTurn);
+
+            TogglePlayerControls(playerControlls, false);
+        }
+
+        private static void TogglePlayerControls(PlayerControlls playerControlls, bool enable)
+        {
+            playerControlls.takeCardButton.interactable = enable;
+            playerControlls.finishTurnButton.interactable = enable;
         }
 
         protected override void TakeCard()
@@ -32,6 +44,10 @@ namespace Assets.Core.PlayerContainer
             if (currentHand.IsPlayersHand)
             {
                 this.score = score;
+            }
+            if (this.score >= ScoreManager.Instance.MaxScore)
+            {
+                FinishTurn();
             }
         }
     }

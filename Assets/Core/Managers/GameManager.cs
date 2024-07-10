@@ -10,6 +10,10 @@ namespace Assets.Core.Managers
 {
     public class GameManager : MonoBehaviour
     {
+        [Header("TurnManager Related")]
+        [Space]
+        [SerializeField] private LoadingScreenManager loadingScreenManager;
+        [Space(25)]
         [Header("Deck Related")]
         [Space]
         [SerializeField] private CardDeck cardDeckToPlay;
@@ -40,17 +44,27 @@ namespace Assets.Core.Managers
 
         private void Awake()
         {
+            DisablePlayerControlls();
             StartCoroutine(SetupGame());
         }
         private IEnumerator SetupGame()
         {
+            loadingScreenManager.FastLoadingScreen();
+
             yield return scoreManager.SetupScoreManager(scoreConfigData);
             yield return turnManager.SetupTurnManager(turnConfigData);
 
             yield return deckManager.SetupDeck(cardDeckToPlay);
-            yield return handsManager.SetupHandManager(playerHand, botHand, handConfigData);
 
+            yield return loadingScreenManager.ToggleLoadingScreen(false);
+
+            yield return handsManager.SetupHandManager(playerHand, botHand, handConfigData);
             yield return turnManager.StartPlaying();
+        }
+        private void DisablePlayerControlls()
+        {
+            turnConfigData.takeCardButton.interactable = false;
+            turnConfigData.finishTurnButton.interactable = false;
         }
     }
 
