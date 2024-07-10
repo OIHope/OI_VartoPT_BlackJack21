@@ -15,6 +15,12 @@ namespace Assets.Core.Managers
 
         private int maxScoreToWin;
 
+        private int _playerScore;
+        private int _botScore;
+
+        public int PlayerScore => _playerScore;
+        public int BotScore => _botScore;
+
         public IEnumerator SetupScoreManager(ScoreConfigData scoreConfigData)
         {
             this.uiPlayerScoreText = scoreConfigData.uiPlayerScoreText;
@@ -45,6 +51,7 @@ namespace Assets.Core.Managers
                 DisplayScore(uiBotScoreText, handScore);
             }
 
+            GlobalEvents.InvokeEvent(GlobalEvents.ON_SCORE_UPDATED, currentHand, handScore);
         }
 
         private int CulculateCardsValues(List<Card> cardsOnHandList, bool overflow)

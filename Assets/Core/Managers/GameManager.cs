@@ -4,6 +4,7 @@ using Assets.Core.PlayerContainer;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Core.Managers
 {
@@ -29,11 +30,11 @@ namespace Assets.Core.Managers
         [Space]
         [SerializeField] private ScoreConfigData scoreConfigData;
         [Space(25)]
-        [Header("PlayersManager Related")]
+        [Header("TurnManager Related")]
         [Space]
-        [SerializeField] private PlayerTurnManager playerTurnManager;
+        [SerializeField] private TurnManager turnManager;
         [Space]
-        [SerializeField] private PlayersConfigData playersConfigData;
+        [SerializeField] private TurnConfigData turnConfigData;
 
 
 
@@ -44,12 +45,12 @@ namespace Assets.Core.Managers
         private IEnumerator SetupGame()
         {
             yield return scoreManager.SetupScoreManager(scoreConfigData);
-            yield return playerTurnManager.SetupPlayerTurnManager(playersConfigData);
+            yield return turnManager.SetupTurnManager(turnConfigData);
 
             yield return deckManager.SetupDeck(cardDeckToPlay);
             yield return handsManager.SetupHandManager(playerHand, botHand, handConfigData);
 
-            yield return playerTurnManager.StartPlaying();
+            yield return turnManager.StartPlaying();
         }
     }
 
@@ -82,9 +83,18 @@ namespace Assets.Core.Managers
     }
 
     [System.Serializable]
-    public class PlayersConfigData
+    public class TurnConfigData
     {
         public Player player;
         public Player bot;
+
+        public Hand playerHand;
+        public Hand botHand;
+
+        public float playerThinkTime = 1f;
+        public float botThinkTime = 2f;
+
+        public Button takeCardButton;
+        public Button finishTurnButton;
     }
 }

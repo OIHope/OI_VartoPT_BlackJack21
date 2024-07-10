@@ -17,6 +17,8 @@ namespace Assets.Core.Managers
 
         public IEnumerator SetupHandManager(Hand playerHand, Hand botHand, HandConfigData handConfigData)
         {
+            GlobalEvents.Subscribe<Hand, bool>(GlobalEvents.ON_PLAYER_TAKES_CARD, TakeCard);
+
             this.playerHand = playerHand;
             this.botHand = botHand;
             deck = handConfigData.deckManager;
@@ -27,13 +29,17 @@ namespace Assets.Core.Managers
             int takeCardsCount = handConfigData.startWithCardsCount;
             for (int i = 0; i < takeCardsCount; i++)
             {
-                yield return HandTakeCard(playerHand, true);
-                yield return HandTakeCard(botHand, false);
+                yield return HandTakesCard(playerHand, true);
+                yield return HandTakesCard(botHand, false);
             }
 
             yield return null;
         }
-        public IEnumerator HandTakeCard(Hand hand, bool openCard)
+        private void TakeCard(Hand hand, bool openCard)
+        {
+            StartCoroutine(HandTakesCard(hand, openCard));
+        }
+        public IEnumerator HandTakesCard(Hand hand, bool openCard)
         {
             CardData cardData = deck.TakeCardFromDeck();
             hand.AddCard(cardData, openCard);

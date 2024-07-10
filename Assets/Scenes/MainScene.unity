@@ -283,7 +283,7 @@ GameObject:
   - component: {fileID: 227451630}
   - component: {fileID: 227451631}
   m_Layer: 0
-  m_Name: ---PlayerManager
+  m_Name: ---TurnManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -685,10 +685,14 @@ MonoBehaviour:
     maxScoreToWin: 21
     uiPlayerScoreText: {fileID: 1458831004}
     uiBotScoreText: {fileID: 1508009498}
-  playerTurnManager: {fileID: 227451631}
-  playersConfigData:
+  turnManager: {fileID: 227451631}
+  turnConfigData:
     player: {fileID: 2072560439}
     bot: {fileID: 2129501273}
+    playerHand: {fileID: 700189508}
+    botHand: {fileID: 1987248019}
+    takeCardButton: {fileID: 1953413778}
+    finishTurnButton: {fileID: 3214543645605616470}
 --- !u!1 &871544382
 GameObject:
   m_ObjectHideFlags: 0
@@ -1512,7 +1516,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 556121041498944890, guid: 155406433098ddc488f1b66fcdadf9ed, type: 3}
       propertyPath: m_Name
-      value: FieldButton (1)
+      value: takeCardButton
       objectReference: {fileID: 0}
     - target: {fileID: 4912144405744289765, guid: 155406433098ddc488f1b66fcdadf9ed, type: 3}
       propertyPath: m_Pivot.x
@@ -1854,6 +1858,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioMusicObject: {fileID: 1746065585}
   audioFXObject: {fileID: 1746065586}
+--- !u!114 &1953413778 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6277760204235541782, guid: 155406433098ddc488f1b66fcdadf9ed, type: 3}
+  m_PrefabInstance: {fileID: 1512178024}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1987248018
 GameObject:
   m_ObjectHideFlags: 0
@@ -2040,7 +2055,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 556121041498944890, guid: 155406433098ddc488f1b66fcdadf9ed, type: 3}
       propertyPath: m_Name
-      value: FieldButton
+      value: finishTurnButton
       objectReference: {fileID: 0}
     - target: {fileID: 4912144405744289765, guid: 155406433098ddc488f1b66fcdadf9ed, type: 3}
       propertyPath: m_Pivot.x
@@ -2132,6 +2147,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 4912144405744289765, guid: 155406433098ddc488f1b66fcdadf9ed, type: 3}
   m_PrefabInstance: {fileID: 3214543645605616468}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3214543645605616470 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6277760204235541782, guid: 155406433098ddc488f1b66fcdadf9ed, type: 3}
+  m_PrefabInstance: {fileID: 3214543645605616468}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

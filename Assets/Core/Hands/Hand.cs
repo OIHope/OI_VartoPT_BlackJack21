@@ -108,7 +108,6 @@ namespace Assets.Core.Hands
 
         }
 
-        [ContextMenu("Add card")]
         public void AddCard(CardData cardData, bool openCard)
         {
             GameObject newCard = Instantiate(cardPrefab, deckTransform.position, Quaternion.identity, transform);
