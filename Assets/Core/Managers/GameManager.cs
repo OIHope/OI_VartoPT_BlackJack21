@@ -12,7 +12,7 @@ namespace Assets.Core.Managers
 {
     public class GameManager : MonoBehaviour
     {
-        [Header("TurnManager Related")]
+        [Header("LoadScreen Related")]
         [Space]
         [SerializeField] private LoadingScreenManager loadingScreenManager;
         [Space(25)]
@@ -41,6 +41,7 @@ namespace Assets.Core.Managers
         [SerializeField] private TurnManager turnManager;
         [Space]
         [SerializeField] private TurnConfigData turnConfigData;
+        [SerializeField] private float lookAtScoreTime = 10f;
         [Space(25)]
         [Header("UI Related")]
         [Space]
@@ -77,6 +78,20 @@ namespace Assets.Core.Managers
             yield return turnManager.StartPlaying();
 
             yield return handsManager.RevealHands();
+
+            GlobalEvents.Subscribe(GlobalEvents.ON_SKIP_BUTTON_CLICKED, SkipToSummingUp);
+
+            yield return new WaitForSeconds(lookAtScoreTime);
+            yield return scoreManager.SumUpScoreAndDeclareWinner();
+        }
+        private void SkipToSummingUp()
+        {
+            StopAllCoroutines();
+            StartCoroutine(SumItUp());
+        }
+        private IEnumerator SumItUp()
+        {
+            GlobalEvents.Unsubscribe(GlobalEvents.ON_SKIP_BUTTON_CLICKED, SkipToSummingUp);
             yield return scoreManager.SumUpScoreAndDeclareWinner();
         }
         private void StartRestartingGame()
@@ -166,11 +181,13 @@ namespace Assets.Core.Managers
 
         public CanvasGroup controlsGameplayScreen;
         public CanvasGroup controlSystemScreen;
+        public CanvasGroup fullScreenButton;
     }
 
     [System.Serializable]
     public class UIControlsData
     {
         public Button restartButton;
+        public Button fullScreenButton;
     }
 }

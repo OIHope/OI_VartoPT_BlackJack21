@@ -17,6 +17,7 @@ namespace Assets.Core.Managers
 
         private CanvasGroup controlsGameplayScreen;
         private CanvasGroup controlsSystemScreen;
+        private CanvasGroup fullScreenButton;
 
         public IEnumerator SetupUIManager(UIConfigData uiConfigData)
         {
@@ -28,6 +29,7 @@ namespace Assets.Core.Managers
             drawScreen = uiConfigData.drawScreen;
             controlsGameplayScreen = uiConfigData.controlsGameplayScreen;
             controlsSystemScreen = uiConfigData.controlSystemScreen;
+            fullScreenButton = uiConfigData.fullScreenButton;
 
             DisableAllPanels();
 
@@ -38,6 +40,7 @@ namespace Assets.Core.Managers
             GlobalEvents.Subscribe(GlobalEvents.ON_PLAYER_LOSE, ShowPlayerLoseScreen);
             GlobalEvents.Subscribe(GlobalEvents.ON_DRAW, ShowDrawScreen);
             GlobalEvents.Subscribe(GlobalEvents.ON_RESTART_TRIGGERED, HideControls);
+            GlobalEvents.Subscribe(GlobalEvents.ON_CARDS_REVEALED, ShowFullScreenButton);
 
             yield return null;
         }
@@ -50,6 +53,7 @@ namespace Assets.Core.Managers
             GlobalEvents.Unsubscribe(GlobalEvents.ON_PLAYER_LOSE, ShowPlayerLoseScreen);
             GlobalEvents.Unsubscribe(GlobalEvents.ON_DRAW, ShowDrawScreen);
             GlobalEvents.Unsubscribe(GlobalEvents.ON_RESTART_TRIGGERED, HideControls);
+            GlobalEvents.Unsubscribe(GlobalEvents.ON_CARDS_REVEALED, ShowFullScreenButton);
 
             yield return null;
         }
@@ -96,14 +100,23 @@ namespace Assets.Core.Managers
             controlsSystemScreen.interactable = true;
             controlsSystemScreen.blocksRaycasts = true;
         }
+        private void ShowFullScreenButton()
+        {
+            fullScreenButton.alpha = 1;
+            fullScreenButton.interactable = true;
+            fullScreenButton.blocksRaycasts = true;
+        }
         private void HideControls()
         {
+            fullScreenButton.alpha = 0;
             controlsGameplayScreen.alpha = 0;
             controlsSystemScreen.alpha = 0;
 
+            fullScreenButton.interactable = false;
             controlsGameplayScreen.interactable = false;
             controlsGameplayScreen.blocksRaycasts = false;
 
+            fullScreenButton.blocksRaycasts = false;
             controlsSystemScreen.interactable = false;
             controlsSystemScreen.blocksRaycasts = false;
         }

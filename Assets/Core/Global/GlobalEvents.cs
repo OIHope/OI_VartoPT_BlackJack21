@@ -25,6 +25,8 @@ namespace Assets.Core.Global
         public const string ON_PLAYER_FINISHED_TURN = ("ON_PLAYER_FINISHED_TURN");
         public const string ON_SCORE_UPDATED = ("ON_SCORE_UPDATED");
 
+        public const string ON_SKIP_BUTTON_CLICKED = ("ON_SKIP_BUTTON_CLICKED");
+
         private static Dictionary<string, Delegate> _eventDictionary = new()
         {
             { ON_PLAYER_TAKES_TURN, (Action)(() => {}) },
@@ -33,7 +35,9 @@ namespace Assets.Core.Global
             { ON_PLAYER_WIN, (Action)(() => {}) },
             { ON_PLAYER_LOSE, (Action)(() => {}) },
             { ON_DRAW, (Action)(() => {}) },
+
             { ON_RESTART_TRIGGERED, (Action)(() => {}) },
+            { ON_SKIP_BUTTON_CLICKED, (Action)(() => {}) },
 
             { ON_BOT_WAITS, (Action)(() => {}) },
             { ON_BOT_TAKES_CARD, (Action)(() => {}) },

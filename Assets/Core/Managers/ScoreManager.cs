@@ -83,27 +83,30 @@ namespace Assets.Core.Managers
 
         public IEnumerator SumUpScoreAndDeclareWinner()
         {
-            bool playerWinsCondition = (_playerScore > _botScore && _playerScore <= maxScoreToWin) || _playerScore <= maxScoreToWin;
-            bool botWinsCondition = (_botScore > _playerScore && _botScore <= maxScoreToWin) || _botScore <= maxScoreToWin;
-            bool drawCondition = _playerScore == _botScore || (!botWinsCondition && !playerWinsCondition);
+            bool playerBust = _playerScore > maxScoreToWin;
+            bool botBust = _botScore > maxScoreToWin;
 
-            Debug.Log($"player win = {playerWinsCondition}, bot win = {botWinsCondition}, draw = {drawCondition}");
-            yield return new WaitForSeconds(3f);
+            bool playerWinsCondition = !playerBust && (botBust || _playerScore > _botScore);
+            bool botWinsCondition = !botBust && (playerBust || _botScore > _playerScore);
+            bool drawCondition = !playerBust && !botBust && _playerScore == _botScore;
+
+            yield return new WaitForSeconds(0.1f);
 
             if (playerWinsCondition)
             {
                 GlobalEvents.InvokeEvent(GlobalEvents.ON_PLAYER_WIN);
-                Debug.Log("Player wins!");
             }
             else if (botWinsCondition)
             {
                 GlobalEvents.InvokeEvent(GlobalEvents.ON_PLAYER_LOSE);
-                Debug.Log("Bot wins!");
             }
             else if (drawCondition)
             {
                 GlobalEvents.InvokeEvent(GlobalEvents.ON_DRAW);
-                Debug.Log("Draw!");
+            }
+            else
+            {
+                Debug.Log("Unexpected condition: no winner and no draw!");
             }
         }
 

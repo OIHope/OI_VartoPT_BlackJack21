@@ -57,12 +57,14 @@ namespace Assets.Core.Hands
         private IEnumerator UpdateCardPositionsCoroutine()
         {
             int cardCount = transform.childCount;
+            int cardNewRenderingOrder = initialRenderingOrder;
 
             for (int i = 0; i < cardCount; i++)
             {
                 Transform cardTransform = transform.GetChild(i);
                 Card card = cardTransform.GetComponent<Card>();
-                card.ChangeCardRenderingOrder(i + initialRenderingOrder);
+                card.ChangeCardRenderingOrder(cardNewRenderingOrder);
+                cardNewRenderingOrder += playersHand ? 1 : -1;
             }
 
             float cardSpacing;
