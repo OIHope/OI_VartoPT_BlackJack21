@@ -4,12 +4,11 @@ namespace Assets.Core.Managers
 {
     public class SoundManager : MonoBehaviour
     {
-        [SerializeField] private AudioSource audioMusicObject;
-        [SerializeField] private AudioSource audioFXObject;
-
-
         private static SoundManager _instance;
         public static SoundManager Instance { get { return _instance; } }
+
+        [SerializeField] private AudioSource audioMusicObject;
+        [SerializeField] private AudioSource audioFXObject;
 
         private void Awake()
         {
@@ -23,10 +22,11 @@ namespace Assets.Core.Managers
             }
         }
 
-        public void PlaySoundFX(AudioClip audioClip, Transform spawnTransform, float volume, bool deTune)
+        public void PlaySoundFX(AudioClip[] audioClips, Transform spawnTransform, float volume, bool deTune)
         {
             AudioSource audioSource = Instantiate(audioFXObject, spawnTransform.position, Quaternion.identity);
-            audioSource.clip = audioClip;
+            int clipIndex = Random.Range(0, audioClips.Length);
+            audioSource.clip = audioClips[clipIndex];
             audioSource.volume = volume;
             audioSource.pitch = deTune ? Random.Range(0.8f, 1.2f) : 1f;
             audioSource.Play();

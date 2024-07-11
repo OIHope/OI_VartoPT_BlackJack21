@@ -13,6 +13,13 @@ namespace Assets.Core.Managers
         private static ScoreManager _instance;
         public static ScoreManager Instance { get { return _instance; } }
 
+        private AudioClip[] voiceReactionsWinSFX;
+        private AudioClip[] voiceReactionsLoseSFX;
+        private AudioClip[] voiceReactionsDrawSFX;
+
+        private AudioClip[] soundReactionsWinSFX;
+        private AudioClip[] soundReactionsLoseSFX;
+        private AudioClip[] soundReactionsDrawSFX;
 
         private TextMeshProUGUI uiPlayerScoreText;
         private TextMeshProUGUI uiBotScoreText;
@@ -43,6 +50,14 @@ namespace Assets.Core.Managers
             uiPlayerScoreText = scoreConfigData.uiPlayerScoreText;
             uiBotScoreText = scoreConfigData.uiBotScoreText;
             maxScoreToWin = scoreConfigData.maxScoreToWin;
+
+            voiceReactionsWinSFX = scoreConfigData.voiceReactionsWinSFX;
+            voiceReactionsLoseSFX = scoreConfigData.voiceReactionsLoseSFX;
+            voiceReactionsDrawSFX = scoreConfigData.voiceReactionsDrawSFX;
+
+            soundReactionsWinSFX = scoreConfigData.soundReactionsWinSFX;
+            soundReactionsLoseSFX = scoreConfigData.soundReactionsLoseSFX;
+            soundReactionsDrawSFX = scoreConfigData.soundReactionsDrawSFX;
 
             GlobalEvents.Subscribe<Hand>(GlobalEvents.ON_CARD_IS_TAKEN, CalculateScore);
 
@@ -88,25 +103,26 @@ namespace Assets.Core.Managers
 
             bool playerWinsCondition = !playerBust && (botBust || _playerScore > _botScore);
             bool botWinsCondition = !botBust && (playerBust || _botScore > _playerScore);
-            bool drawCondition = !playerBust && !botBust && _playerScore == _botScore;
 
             yield return new WaitForSeconds(0.1f);
 
             if (playerWinsCondition)
             {
                 GlobalEvents.InvokeEvent(GlobalEvents.ON_PLAYER_WIN);
+                SoundManager.Instance.PlaySoundFX(voiceReactionsWinSFX, transform, 1f, false);
+                SoundManager.Instance.PlaySoundFX(soundReactionsWinSFX, transform, 1f, false);
             }
             else if (botWinsCondition)
             {
                 GlobalEvents.InvokeEvent(GlobalEvents.ON_PLAYER_LOSE);
-            }
-            else if (drawCondition)
-            {
-                GlobalEvents.InvokeEvent(GlobalEvents.ON_DRAW);
+                SoundManager.Instance.PlaySoundFX(voiceReactionsLoseSFX, transform, 1f, false);
+                SoundManager.Instance.PlaySoundFX(soundReactionsLoseSFX, transform, 1f, false);
             }
             else
             {
-                Debug.Log("Unexpected condition: no winner and no draw!");
+                GlobalEvents.InvokeEvent(GlobalEvents.ON_DRAW);
+                SoundManager.Instance.PlaySoundFX(voiceReactionsDrawSFX, transform, 1f, false);
+                SoundManager.Instance.PlaySoundFX(soundReactionsDrawSFX, transform, 1f, false);
             }
         }
 

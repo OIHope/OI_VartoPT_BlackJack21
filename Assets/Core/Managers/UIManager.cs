@@ -1,5 +1,6 @@
 using Assets.Core.Global;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 namespace Assets.Core.Managers
@@ -23,10 +24,13 @@ namespace Assets.Core.Managers
         {
             playerStatsScreen = uiConfigData.playerStatsScreen;
             botStatsScreen = uiConfigData.botStatsScreen;
+
             botActionsScreen = uiConfigData.botActionsScreen;
+
             playerWinScreen = uiConfigData.playerWinScreen;
             playerLoseScreen = uiConfigData.playerLoseScreen;
             drawScreen = uiConfigData.drawScreen;
+
             controlsGameplayScreen = uiConfigData.controlsGameplayScreen;
             controlsSystemScreen = uiConfigData.controlSystemScreen;
             fullScreenButton = uiConfigData.fullScreenButton;
@@ -120,7 +124,6 @@ namespace Assets.Core.Managers
             controlsSystemScreen.interactable = false;
             controlsSystemScreen.blocksRaycasts = false;
         }
-
         private void DisableAllPanels()
         {
             playerStatsScreen.alpha = 0;

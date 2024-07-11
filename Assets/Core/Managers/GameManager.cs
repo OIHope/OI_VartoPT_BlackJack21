@@ -15,6 +15,8 @@ namespace Assets.Core.Managers
         [Header("LoadScreen Related")]
         [Space]
         [SerializeField] private LoadingScreenManager loadingScreenManager;
+        [Space]
+        public AudioClip[] loadingSFX;
         [Space(25)]
         [Header("Deck Related")]
         [Space]
@@ -48,6 +50,8 @@ namespace Assets.Core.Managers
         [SerializeField] private UIManager uiManager;
         [Space]
         [SerializeField] private UIConfigData uiConfigData;
+        [Space]
+        [SerializeField] private BotActionsLogManager botActionsLogManager;
         [Space(10)]
         [SerializeField] private UIControlsManager uiControlsManager;
         [SerializeField] private UIControlsData uiControlsData;
@@ -57,6 +61,7 @@ namespace Assets.Core.Managers
         private void Awake()
         {
             DisablePlayerControlls();
+            
             StartCoroutine(SetupGame());
         }
         private IEnumerator SetupGame()
@@ -65,6 +70,9 @@ namespace Assets.Core.Managers
 
             yield return uiManager.SetupUIManager(uiConfigData);
             yield return uiControlsManager.SetupUIContolsManager(uiControlsData);
+            yield return botActionsLogManager.SetupBotActionsLogManager(uiConfigData);
+
+            SoundManager.Instance.PlaySoundFX(loadingSFX, transform, 1f, true);
 
             yield return scoreManager.SetupScoreManager(scoreConfigData);
             yield return turnManager.SetupTurnManager(turnConfigData);
@@ -82,7 +90,7 @@ namespace Assets.Core.Managers
             GlobalEvents.Subscribe(GlobalEvents.ON_SKIP_BUTTON_CLICKED, SkipToSummingUp);
 
             yield return new WaitForSeconds(lookAtScoreTime);
-            yield return scoreManager.SumUpScoreAndDeclareWinner();
+            SkipToSummingUp();
         }
         private void SkipToSummingUp()
         {
@@ -106,6 +114,7 @@ namespace Assets.Core.Managers
 
             yield return uiManager.UninstalUIManager();
             yield return uiControlsManager.UninstalUIControlsManager();
+            yield return botActionsLogManager.UninstalBotActionsLogManager();
             yield return scoreManager.UninstalScoreManager();
             yield return handsManager.UninstalHandsManager();
 
@@ -140,6 +149,8 @@ namespace Assets.Core.Managers
         public int initialRenderingOrder = 500;
         [Space(25)]
         public AnimationCurve transitionSpeedCurve;
+        [Space]
+        public AudioClip[] takeCardSFX;
     }
 
     [System.Serializable]
@@ -149,6 +160,14 @@ namespace Assets.Core.Managers
         [Space]
         public TextMeshProUGUI uiPlayerScoreText;
         public TextMeshProUGUI uiBotScoreText;
+        [Space]
+        public AudioClip[] voiceReactionsWinSFX;
+        public AudioClip[] voiceReactionsLoseSFX;
+        public AudioClip[] voiceReactionsDrawSFX;
+        [Space]
+        public AudioClip[] soundReactionsWinSFX;
+        public AudioClip[] soundReactionsLoseSFX;
+        public AudioClip[] soundReactionsDrawSFX;
     }
 
     [System.Serializable]
@@ -156,15 +175,18 @@ namespace Assets.Core.Managers
     {
         public Player player;
         public Player bot;
-
+        [Space]
         public Hand playerHand;
         public Hand botHand;
-
+        [Space]
         public float playerThinkTime = 1f;
         public float botThinkTime = 2f;
-
+        [Space]
         public Button takeCardButton;
         public Button finishTurnButton;
+        [Space]
+        public AudioClip[] turnReactionsTakeCardSFX;
+        public AudioClip[] turnReactionsPassTurnSFX;
     }
 
     [System.Serializable]
@@ -174,6 +196,11 @@ namespace Assets.Core.Managers
         public CanvasGroup botStatsScreen;
 
         public CanvasGroup botActionsScreen;
+        public TextMeshProUGUI botActionsText;
+        public string waitActionDescription;
+        public string thinkActionDescription;
+        public string takeCardActionDescription;
+        public string passTurnActionDescription;
 
         public CanvasGroup playerWinScreen;
         public CanvasGroup playerLoseScreen;

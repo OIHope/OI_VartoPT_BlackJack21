@@ -14,6 +14,7 @@ namespace Assets.Core.Managers
         private Hand botHand;
 
         private DeckManager deck;
+        private AudioClip[] takeCardSFX;
 
         public IEnumerator SetupHandManager(Hand playerHand, Hand botHand, HandConfigData handConfigData)
         {
@@ -22,6 +23,7 @@ namespace Assets.Core.Managers
             this.playerHand = playerHand;
             this.botHand = botHand;
             deck = handConfigData.deckManager;
+            takeCardSFX = handConfigData.takeCardSFX;
 
             playerHand.SetupHand(handConfigData, true);
             botHand.SetupHand(handConfigData, false);
@@ -48,13 +50,23 @@ namespace Assets.Core.Managers
         {
             CardData cardData = deck.TakeCardFromDeck();
             hand.AddCard(cardData, openCard);
+
+            PlayTakeCardSound();
+
             yield return new WaitForSeconds(takeCardsDelay);
         }
         public IEnumerator RevealHands()
         {
+            PlayTakeCardSound();
             yield return playerHand.OpenHand();
+            PlayTakeCardSound();
             yield return botHand.OpenHand();
             GlobalEvents.InvokeEvent(GlobalEvents.ON_CARDS_REVEALED);
+        }
+
+        private void PlayTakeCardSound()
+        {
+            SoundManager.Instance.PlaySoundFX(takeCardSFX, transform, 1f, true);
         }
     }
 }

@@ -16,6 +16,9 @@ namespace Assets.Core.PlayerContainer
 
         protected bool readyToPassTurn = false;
 
+        protected AudioClip[] turnReactionsTakeCardSFX;
+        protected AudioClip[] turnReactionsPassTurnSFX;
+
         protected void Awake()
         {
             if (!subscribedToScoreUpdate)
@@ -30,6 +33,10 @@ namespace Assets.Core.PlayerContainer
             {
                 SubscribeToScoreUpdate(true);
             }
+
+            turnReactionsTakeCardSFX = playerControlls.turnReactionsTakeCardSFX;
+            turnReactionsPassTurnSFX = playerControlls.turnReactionsPassTurnSFX;
+
             this.playersHand = playersHand;
             readyToPassTurn = false;
             yield return null;

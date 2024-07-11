@@ -31,6 +31,9 @@ namespace Assets.Core.Managers
             playerControlls.takeCardButton = turnConfigData.takeCardButton;
             playerControlls.finishTurnButton = turnConfigData.finishTurnButton;
 
+            playerControlls.turnReactionsTakeCardSFX = turnConfigData.turnReactionsTakeCardSFX;
+            playerControlls.turnReactionsPassTurnSFX = turnConfigData.turnReactionsPassTurnSFX;
+
             yield return null;
         }
 
@@ -60,5 +63,8 @@ namespace Assets.Core.Managers
 
         public Button takeCardButton;
         public Button finishTurnButton;
+
+        public AudioClip[] turnReactionsTakeCardSFX;
+        public AudioClip[] turnReactionsPassTurnSFX;
     }
 }

@@ -22,15 +22,16 @@ namespace Assets.Core.PlayerContainer
                 if (WillTakeCard(score, maxScore))
                 {
                     GlobalEvents.InvokeEvent(GlobalEvents.ON_BOT_TAKES_CARD);
+                    SoundManager.Instance.PlaySoundFX(turnReactionsTakeCardSFX, transform, 1f, false);
                     TakeCard();
                 }
                 else
                 {
-                    GlobalEvents.InvokeEvent(GlobalEvents.ON_BOT_PASS_TURN);
                     FinishTurn();
                 }
             }
-
+            GlobalEvents.InvokeEvent(GlobalEvents.ON_BOT_PASS_TURN);
+            SoundManager.Instance.PlaySoundFX(turnReactionsPassTurnSFX, transform, 1f, false);
             yield return new WaitForSeconds(thinkTime);
         }
 

@@ -21,6 +21,7 @@ namespace Assets.Core.PlayerContainer
             thinkTime = playerControlls.playerThinkTime;
 
             yield return new WaitUntil(() => readyToPassTurn);
+            SoundManager.Instance.PlaySoundFX(turnReactionsPassTurnSFX, transform, 1f, false);
 
             playerControlls.takeCardButton.onClick.RemoveListener(TakeCard);
             playerControlls.finishTurnButton.onClick.RemoveListener(FinishTurn);
@@ -37,6 +38,7 @@ namespace Assets.Core.PlayerContainer
         protected override void TakeCard()
         {
             GlobalEvents.InvokeEvent(GlobalEvents.ON_PLAYER_TAKES_CARD, playersHand, true);
+            SoundManager.Instance.PlaySoundFX(turnReactionsTakeCardSFX, transform, 1f, false);
         }
 
         protected override void UpdateScore(Hand currentHand, int score)
